@@ -27,7 +27,7 @@ void print(int *vt, int size) {
     
     printf("\n");
 }
-// Algoritmos de ordenacao
+// Algoritmos de ordenacao simples
 void selectionSort(int *v, int size) {
     int i, j, min_index;
     for (i = 0; i < size - 1; i++) {
@@ -81,6 +81,59 @@ void insertionSort(int *v, int size) {
     // Adaptacao para este codigo
     print(v, size);
     free(v);
+}
+
+// Algoritmos de ordenacao com metodo Dividir e Conquistar
+void mergeSort() {
+
+}
+
+void quickSort() {
+
+}
+
+// Algoritmos de ordenacao com metodo Transformar e Conquistar
+// Funcoes auxiliares
+void maxHeapify(int *v, int index) {
+
+}
+
+void buildHeap(int *v, int length) {
+
+}
+
+int heapPop(int *v, int length) {
+
+}
+
+void heapSort(int *v, int length) {
+
+}
+
+// Algoritmos de ordenação sem comparação [O(n)]
+int countingSort(int *v, int *ord, int sizeV, int max) { // Necessita que as chaves sejam INTEIROS
+    int i;
+    int *aux = calloc((max + 1), sizeof(int));
+    for (i = 0; i < sizeV; i++)
+        aux[v[i]]++;
+    
+    for (i = 1; i < max; i++)
+        aux[i] += aux[i - 1];
+
+    for (i = sizeV - 1; i > 0; i--) {
+        ord[aux[v[i]]] = v[i];
+        aux[v[i]]--;
+    }
+
+    free(aux);
+}
+
+void radixSort(int *v) {
+
+}
+
+void bucketSort() { // binSort
+
 }
 
 int main() {

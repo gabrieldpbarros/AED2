@@ -13,7 +13,7 @@ void copyVector(long int *model, long int *aux, int size) {
 }
 
 void selectionSort(long int *v, int size) {
-    int comp = 0, exc = 0;
+    long int comp = 0, exc = 0;
     int i, j, min_index;
     for (i = 0; i < size - 1; i++) {
         min_index = i;
@@ -29,11 +29,11 @@ void selectionSort(long int *v, int size) {
         }
     }
 
-    printf("%d %d\n", comp, exc);
+    printf("%ld %ld\n", comp, exc);
 }
 
 void bubbleSort(long int *v, int size) {
-    int comp = 0, exc = 0;
+    long int comp = 0, exc = 0;
     int i, j;
     for (i = 0; i < size - 1; i++) {
         for (j = 0; j < size - 1 - i; j++) {
@@ -48,11 +48,11 @@ void bubbleSort(long int *v, int size) {
             break;
     }
 
-    printf("%d %d\n", comp, exc);
+    printf("%ld %ld\n", comp, exc);
 }
 
 void insertionSort(long int *v, int size) {
-    int comp = 0, exc = 0;
+    long int comp = 0, exc = 0;
     int i, j;
     for (i = 1; i < size; i++) {
         long int key = v[i];
@@ -73,7 +73,7 @@ void insertionSort(long int *v, int size) {
         }
     }
 
-    printf("%d %d\n", comp, exc);
+    printf("%ld %ld\n", comp, exc);
 }
 
 int main() {
