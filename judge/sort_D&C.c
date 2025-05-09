@@ -1,42 +1,57 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define INFINITY 2147483648
+int *copyVector(int *mold, int size) {
+    int *copy = malloc(size * sizeof(int));
+    for (int i = 0; i < size; i++)
+        copy[i] = mold[i];
 
-void merge(int *v, int start, int middle, int end) {
-    int i, j, k;
+    return copy;
+}
+
+int merge(int *v, int start, int middle, int end) {
+    int i, j, k, comp = 0;
     int size1 = middle - start + 1;
     int size2 = end - middle;
     // Vetores auxiliares temporários
-    unsigned int *left = malloc((size1 + 1) * sizeof(unsigned int));
-    unsigned int *right = malloc((size2 + 1) * sizeof(unsigned int));
+    int *left = malloc(size1 * sizeof(int));
+    int *right = malloc(size2 * sizeof(int));
     for (i = 0; i < size1; i++)
         left[i] = v[start + i];
     for (j = 0; j < size2; j++)
         right[j] = v[middle + j + 1];
-    left[size1] = INFINITY;
-    right[size2] = INFINITY;
-    i = 0;
-    j = 0;
 
-    for (k = start; k < end + 1; k++) {
+    i = j = 0;
+    k = start;
+
+    while (i < size1 && j < size2) {
+        comp++;
         if (left[i] <= right[j])
-            v[k] = left[i++];
+            v[k++] = left[i++];
         else
-            v[k] = right[j++];
+            v[k++] = right[j++];
     }
+
+    while (i < size1)
+        v[k++] = left[i++];
+    while (j < size2)
+        v[k++] = right[j++];
     
     free(left);
     free(right);
+    printf("merge(%d, %d, %d): %d comp\n", start, middle, end, comp);
+
+    return comp;
 }
 
-void mergeSort(int *v, int start, int end) {
+int mergeSort(int *v, int start, int end) {
     if (start < end) {
         int middle = start + (end - start) / 2;
-        mergeSort(v, start, middle);
-        mergeSort(v, middle + 1, end);
-        merge(v, start, middle, end);
+        return mergeSort(v, start, middle) + 
+               mergeSort(v, middle + 1, end) + 
+               merge(v, start, middle, end);
     }
+    return 0;
 }
 
 void swap(int *n1, int *n2) {
@@ -45,66 +60,83 @@ void swap(int *n1, int *n2) {
     *n2 = temp;
 }
 
-int selectPivot(int *v, int start, int end) { // ERRO AQUI
+int selectPivot(int *v, int start, int end) {
     int middle = start + (end - start) / 2;
 
     if (v[start] > v[middle])
         swap(&v[start], &v[middle]);
     if (v[start] > v[end - 1])
-        swap(&v[start], &v[end]);
+        swap(&v[start], &v[end - 1]);
     if (v[middle] > v[end - 1])
-        swap(&v[middle], &v[end]);
+        swap(&v[middle], &v[end - 1]);
 
     return middle;
 }
 
 int partition(int *v, int start, int end) {
     int pivot_index = selectPivot(v, start, end);
-    swap(&v[pivot_index], &v[end]); // Insere o pivo no final do vetor
+    swap(&v[pivot_index], &v[end - 1]); // Insere o pivo no final do vetor
+    int pivot = v[end - 1];
 
-    int i, j = 0;
+    int i, j = start;
     for (i = start; i < end - 1; i++)
-        if (v[i] < v[end])
-            swap(&v[++j], &v[i]);
+        if (v[i] < pivot)
+            swap(&v[j++], &v[i]);
 
-    swap(&v[++j], &v[end]);
+    swap(&v[j], &v[end - 1]);
     return j;
 }
 
-void quickSort(int *v, int start, int end) {
+int quickSort(int *v, int start, int end) {
     if (start < end) {
         int pivot = partition(v, start, end);
-        quickSort(v, start, pivot - 1);
+        quickSort(v, start, pivot);
         quickSort(v, pivot + 1, end);
     }
 }
 
-void insertionSort() {
+void insertionSort(int *v, int size) {
+    int i, j;
+    for (i = 1; i < size; i++) {
+        int key = v[i];
+        j = i - 1;
 
+        while (j >= 0 && v[j] > key)
+            v[j + 1] = v[j--];
+
+        v[j + 1] = key;
+    }
 }
 
-void quickSortEF(int *v, int start, int end) {
-    if (end - start + 1 > 5) {
+int quickSortEF(int *v, int start, int end) {
+    if (end - start > 5) {
         int pivot = partition(v, start, end);
-        quickSort(v, start, pivot - 1);
-        quickSort(v, pivot + 1, end);
-    } else
-        insertionSort();
+        quickSortEF(v, start, pivot);
+        quickSortEF(v, pivot + 1, end);
+    } else {
+        int size = end - start;
+        insertionSort(&v[start], size);
+    }
 }
 
-#define SIZE 6
 int main() {
-    int jorje[SIZE];
-    int j = 0;
-    for(int i = SIZE; i > 0; i--)
-        jorje[j++] = i;
-    for(int i = 0; i < SIZE; i++)
-        printf("%d ", jorje[i]);
-    printf("\n");
+    int size;
+    scanf("%d", &size);
 
-    quickSort(jorje, 0, 6);
-    for(int i = 0; i < SIZE; i++)
-        printf("%d ", jorje[i]);
+    int *vt = malloc(size * sizeof(int));
+    for (int i = 0; i < size; i++)
+        scanf("%d", &vt[i]);
+
+    int *aux = copyVector(vt, size);
+    int count = mergeSort(aux, 0, size - 1);
+    printf("merge = %d\n", count);
+
+    aux = copyVector(vt, size);
+    count = quickSort(aux, 0, size);
+    printf("quick = %d\n", count);
+
+    count = quickSortEF(vt, 0, size);
+    printf("quick eficiente = %d\n", count);
 
     return 0;
 }
