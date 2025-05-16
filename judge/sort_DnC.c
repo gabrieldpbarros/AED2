@@ -10,19 +10,19 @@ int *copyVector(int *mold, int size) {
     return copy;
 }
 
-// void print(int *vt, int size) {
-//     for (int i = 0; i < size; i++)
-//         printf("%d ", vt[i]);
-//     printf("\n");
-// }   
+void print(int *vt, int size) {
+    for (int i = 0; i < size; i++)
+        printf("%d ", vt[i]);
+    printf("\n");
+}   
 
 int merge(int *v, int start, int middle, int end) {
     int i, j, k, comp = 0;
     int size1 = middle - start + 1;
     int size2 = end - middle;
     // Vetores auxiliares temporários
-    int *left = malloc((size1 + 1) * sizeof(int));
-    int *right = malloc((size2 + 1) * sizeof(int));
+    int *left = (int*) malloc((size1 + 1) * sizeof(int));
+    int *right = (int*) malloc((size2 + 1) * sizeof(int));
 
     for (i = 0; i < size1; i++)
         left[i] = v[start + i];
@@ -65,56 +65,55 @@ void swap(int *n1, int *n2) {
 int selectPivot(int *v, int start, int end, int *counter) {
     int middle = start + (end - start) / 2;
 
+    (*counter)++;
     if (v[start] > v[middle])
         swap(&v[start], &v[middle]);
     
-    if (v[start] > v[end - 1]) 
-        swap(&v[start], &v[end - 1]);
+    (*counter)++;
+    if (v[start] > v[end]) 
+        swap(&v[start], &v[end]);
 
-    if (v[middle] > v[end - 1])
-        swap(&v[middle], &v[end - 1]);
+    (*counter)++;
+    if (v[middle] > v[end])
+        swap(&v[middle], &v[end]);
 
-    (*counter) += 3;
-
-    return middle;
+    swap(&v[middle], &v[end]); // Insere o pivo no final do vetor
+    return v[end];
 }
 
 int partition(int *v, int start, int end, int *counter) {
-    int pivot_index = selectPivot(v, start, end, counter);
-    swap(&v[pivot_index], &v[end - 1]); // Insere o pivo no final do vetor
-    int pivot = v[end - 1];
+    int pivot = selectPivot(v, start, end, counter);;
 
-    int i, j = start;
-    for (i = start; i < end - 1; i++) {
+    int i, j = start - 1;
+    for (i = start; i < end; i++) {
         (*counter)++;
-        if (v[i] < pivot)
-            swap(&v[j++], &v[i]);  
+        if (v[i] <= pivot)
+            swap(&v[++j], &v[i]);  
     }
 
-    swap(&v[j], &v[end - 1]);
+    swap(&v[++j], &v[end]);
     return j;
 }
 
 void quickSort(int *v, int start, int end, int *counter) {
-    if (start < end - 1) {
+    if (start < end) {
         int pivot = partition(v, start, end, counter);
-        quickSort(v, start, pivot, counter);
+        quickSort(v, start, pivot - 1, counter);
         quickSort(v, pivot + 1, end, counter);
     }
 }
 
-void insertionSort(int *v, int size, int *counter) {
+void insertionSort(int *v, int start, int end, int *counter) {
     int i, j;
-    for (i = 1; i < size; i++) {
+    for (i = start + 1; i <= end; i++) {
         int key = v[i];
         j = i - 1;
 
-        while (j >= 0) {
+        while (j >= start) {
             (*counter)++;
             if (v[j] > key)
                 v[j + 1] = v[j--];
-            else
-                break;
+            else break;
         }
 
         v[j + 1] = key;
@@ -122,13 +121,12 @@ void insertionSort(int *v, int size, int *counter) {
 }
 
 void quickSortEF(int *v, int start, int end, int *counter) {
-    if (end - start > 5) {
+    if (end - start + 1 <= 5) 
+        insertionSort(v, start, end, counter);
+    else {
         int pivot = partition(v, start, end, counter);
-        quickSortEF(v, start, pivot, counter);
+        quickSortEF(v, start, pivot - 1, counter);
         quickSortEF(v, pivot + 1, end, counter);
-    } else {
-        int size = end - start;
-        insertionSort(&v[start], size, counter);
     }
 }
 
@@ -142,20 +140,24 @@ int main() {
 
     int *aux = copyVector(vt, size);
     int countMerge = mergeSort(aux, 0, size - 1);
-    printf("merge = %d\n", countMerge);
+    print(aux, size);
+    printf("%d\n", countMerge);
 
     int countQuick;
     int *p = &countQuick;
 
     *p = 0;
     aux = copyVector(vt, size);
-    quickSort(aux, 0, size, p);
-    printf("quick = %d\n", countQuick);
+    quickSort(aux, 0, size - 1, p);
+    print(aux, size);
+    printf("%d\n", countQuick);
     
     *p = 0;
-    quickSortEF(vt, 0, size, p);
-    printf("quick eficiente = %d\n", countQuick);
+    quickSortEF(vt, 0, size - 1, p);
+    print(vt, size);
+    printf("%d\n", countQuick);
 
+    free(vt);
     free(aux);
 
     return 0;
