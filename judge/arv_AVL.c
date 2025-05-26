@@ -18,7 +18,13 @@ int getHeight(tree *node) {
     return node ? node->height : -1;
 }
 
-tree* createNode(int n) {
+tree *findMin(tree* node) {
+    while (node->left != NULL)
+        node = node->left;
+    return node;
+}
+
+tree *createNode(int n) {
     tree *new_node = (tree*)malloc(sizeof(tree));
     new_node->value = n;
     new_node->height = 0;
@@ -28,6 +34,20 @@ tree* createNode(int n) {
     return new_node;
 }
 
+tree* findNode(tree* root, int value) {
+    if (root == NULL || root->value == value) return root;
+    return (value < root->value) ? findNode(root->left, value) : findNode(root->right, value);
+}
+
+void freeTree(tree *root) {
+    if (root != NULL) {
+        freeTree(root->left);
+        freeTree(root->right);
+        free(root);
+    }
+}
+
+// Rotacoes
 tree *LL(tree *subtree) {
     tree *pA = subtree;
     tree *pB = subtree->left;
@@ -90,7 +110,7 @@ tree *RL(tree *subtree) {
     return pC;
 }
 
-tree* rotateAB(tree *node) {
+tree *rotateAB(tree *node) {
     if (node->bal_fact > 1) {
         if (node->left->bal_fact >= 0)
             return LL(node);
@@ -105,7 +125,8 @@ tree* rotateAB(tree *node) {
     return node;
 }
 
-tree* insertAVL(tree *root, int value) {
+// Operacoes
+tree *insertAVL(tree *root, int value) {
     if (root == NULL)
         return createNode(value);
 
@@ -123,13 +144,7 @@ tree* insertAVL(tree *root, int value) {
     return rotateAB(root);
 }
 
-tree* findMin(tree* node) {
-    while (node->left != NULL)
-        node = node->left;
-    return node;
-}
-
-tree* removeAVL(tree* root, int value) {
+tree *removeAVL(tree* root, int value) {
     if (root == NULL)
         return NULL;
 
@@ -162,11 +177,7 @@ int binSearch(tree *root, int value) {
     return (value < root->value) ? binSearch(root->left, value) : binSearch(root->right, value);
 }
 
-tree* findNode(tree* root, int value) {
-    if (root == NULL || root->value == value) return root;
-    return (value < root->value) ? findNode(root->left, value) : findNode(root->right, value);
-}
-
+// Saidas
 void printHeights(tree *root) {
     if (!root) {
         printf("ARVORE VAZIA\n");
@@ -177,7 +188,7 @@ void printHeights(tree *root) {
     printf("%d, %d, %d\n", root->height, he, hd);
 }
 
-void checkAndPrint(tree* root, int a, int b, int *printed, int *firstPrinted) {
+void checkAndPrint(tree *root, int a, int b, int *printed, int *firstPrinted) {
     if (!root) return;
     if (root->value > a) checkAndPrint(root->left, a, b, printed, firstPrinted);
     if (root->value >= a && root->value <= b) {
@@ -189,7 +200,7 @@ void checkAndPrint(tree* root, int a, int b, int *printed, int *firstPrinted) {
     if (root->value < b) checkAndPrint(root->right, a, b, printed, firstPrinted);
 }
 
-void printInRangeWithHeights(tree* root, int a, int b) {
+void printInRangeWithHeights(tree *root, int a, int b) {
     if (!root) return;
     if (root->value > a) printInRangeWithHeights(root->left, a, b);
     if (root->value >= a && root->value <= b) {
@@ -199,14 +210,6 @@ void printInRangeWithHeights(tree* root, int a, int b) {
         printf("%d, %d, %d\n", node->height, hl, hr);
     }
     if (root->value < b) printInRangeWithHeights(root->right, a, b);
-}
-
-void freeTree(tree *root) {
-    if (root != NULL) {
-        freeTree(root->left);
-        freeTree(root->right);
-        free(root);
-    }
 }
 
 int main() {
@@ -237,7 +240,8 @@ int main() {
     scanf("%d %d", &a, &b);
 
     checkAndPrint(AVL, a, b, &printed, &firstPrinted);
-    if (!printed) printf("NADA A EXIBIR\n");
+    if (!printed)
+        printf("NADA A EXIBIR\n");
     else {
         printf("\n");
         printInRangeWithHeights(AVL, a, b);
