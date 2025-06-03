@@ -155,16 +155,31 @@ tree *removeAVL(tree *root, int value) {
     return rotateAB(root);
 }
 // Busca
-int binSearch(tree *root, int value) {
-    if (root == NULL)
-        return 0;
-    else if (root->value == value)
-        return 1;
+// int binSearch(tree *root, int value) {
+//     if (root == NULL)
+//         return 0;
+//     else if (root->value == value)
+//         return 1;
+// 
+//     if (value < root->value)
+//         return binSearch(root->left, value);
+//     else if (value > root->value)
+//         return binSearch(root->right, value);
+// }
 
-    if (value < root->value)
-        return binSearch(root->left, value);
-    else if (value > root->value)
-        return binSearch(root->right, value);
+// Impressao
+void maxHeight(tree *root) {
+    int he = getHeight(root->left) + 1;
+    int hd = getHeight(root->right) + 1;
+    printf("%d, %d, %d\n", root->height, he, hd);
+}
+
+void blackHeight(tree *root) {
+
+}
+
+void printChanges(tree *root) {
+    
 }
 
 void freeTree(tree *root) {
@@ -174,28 +189,18 @@ void freeTree(tree *root) {
         free(root);
     }
 }
-
-int main() { // ALTERAR MAIN
+// IDEIAS: duas arvores, uma em AVL e outra em ARN
+int main() {
     int num;
-    tree *AVL = NULL;
+    tree *ARN = NULL;
     // Insere
     while (1) {
         scanf("%d", &num);
         if (num == -1) break;
-        AVL = insertAVL(AVL, num);
-    }
-    // Busca e insere/remove
-    while (1) {
-        scanf("%d", &num);
-        if (num == -1) break;
-
-        if (binSearch(AVL, num)) 
-            AVL = removeAVL(AVL, num);
-        else
-            AVL = insertAVL(AVL, num);
+        ARN = insertAVL(ARN, num);
     }
 
-    freeTree(AVL);
+    freeTree(ARN);
 
     return 0;
 }
